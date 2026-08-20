@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>แดชบอร์ดตรวจตู้ยา</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#FAF7F0; --surface:#FFFFFF; --ink:#20291F; --ink-soft:#5B6459;
+      --primary:#1F3D2B; --primary-light:#2F5940; --accent:#C17817; --accent-soft:#F3E3C2;
+      --good:#2E7D4F; --good-soft:#E4F2E9; --bad:#B8412C; --bad-soft:#F8E7E2;
+      --idle:#B9B2A0; --idle-soft:#EFEBE0; --frost:#3E7CA6; --frost-soft:#E4EEF4;
+      --border:#E4DFD0; --radius:14px;
+    }
+    *{box-sizing:border-box;}
+    body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Noto Sans Thai',sans-serif; -webkit-font-smoothing:antialiased; font-size:16px; }
+    header.top{ background:var(--primary); color:#fff; padding:22px 20px 30px; position:relative; overflow:hidden; }
+    header.top::after{ content:""; position:absolute; right:-40px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(193,120,23,.35), transparent 70%); }
+    .top-nav{ display:flex; justify-content:space-between; align-items:center; position:relative; }
+    header.top h1{ font-family:'Noto Serif Thai',serif; font-size:23px; margin:0 0 4px; }
+    header.top p{ margin:0; font-size:14px; opacity:.85; }
+    .nav-link{ color:#fff; text-decoration:none; font-size:14.5px; border:1px solid rgba(255,255,255,.5); padding:7px 14px; border-radius:999px; white-space:nowrap; background:transparent; cursor:pointer; }
+    .nav-link:hover{ background:rgba(255,255,255,.12); }
+
+    main{ max-width:1000px; margin:0 auto; padding:0 16px 40px; }
+
+    .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-top:16px; box-shadow:0 8px 24px rgba(31,61,43,.06); }
+    .section-title{ font-family:'Noto Serif Thai',serif; font-size:19px; color:var(--primary); margin:0 0 4px; }
+    .section-sub{ font-size:14px; color:var(--ink-soft); margin:0 0 16px; }
+
+    .shelf{ display:grid; grid-template-columns:repeat(7, 1fr); gap:9px; }
+    @media (max-width:700px){ .shelf{ grid-template-columns:repeat(4,1fr);} }
+    @media (max-width:420px){ .shelf{ grid-template-columns:repeat(3,1fr);} }
+    .drawer{ border-radius:10px; padding:10px 8px; background:linear-gradient(180deg,#FFFDF8,#FBF6EA); border:1px solid var(--border); border-top:4px solid var(--idle); position:relative; min-height:82px; }
+    .drawer.pass{ border-top-color:var(--good); }
+    .drawer.fail{ border-top-color:var(--bad); }
+    .drawer.fridgecab{ background:linear-gradient(180deg,#FFFDF8,var(--frost-soft)); }
+    .drawer .letter{ font-family:'Noto Serif Thai',serif; font-size:18px; font-weight:700; color:var(--primary); }
+    .drawer .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-left:5px; background:var(--idle); vertical-align:middle; }
+    .drawer.pass .dot{ background:var(--good); }
+    .drawer.fail .dot{ background:var(--bad); }
+    .drawer .meta{ font-size:12.5px; color:var(--ink-soft); margin-top:5px; line-height:1.45; }
+    .drawer .meta b{ color:var(--ink); font-weight:600; }
+    .drawer .empty-label{ font-size:12.5px; color:var(--idle); margin-top:5px; }
+    .snow{ position:absolute; top:8px; right:8px; font-size:11px; }
+
+    .legend{ display:flex; gap:16px; margin-top:14px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-soft); }
+    .legend span{ display:inline-flex; align-items:center; gap:6px; }
+    .legend i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+
+    .filters{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+    @media (max-width:800px){ .filters{ grid-template-columns:repeat(2,1fr);} }
+    .filters label{ font-size:13.5px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:4px; }
+    .filters input, .filters select{ width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:9px; font-family:inherit; font-size:15px; background:#FFFDF8; color:var(--ink); }
+    .filters input:focus, .filters select:focus{ outline:none; border-color:var(--primary-light); }
+    .filter-actions{ margin-top:12px; display:flex; gap:8px; }
+    button.btn{ border:none; border-radius:9px; padding:9px 16px; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; }
+    button.btn.primary{ background:var(--primary); color:#fff; }
+    button.btn.ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--border); }
+
+    .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px; }
+    @media (max-width:700px){ .stats{ grid-template-columns:repeat(2,1fr);} }
+    .stat{ background:#FFFDF8; border:1px solid var(--border); border-radius:10px; padding:12px; }
+    .stat .num{ font-family:'Noto Serif Thai',serif; font-size:25px; color:var(--primary); font-weight:700; }
+    .stat .lbl{ font-size:13.5px; color:var(--ink-soft); margin-top:2px; }
+
+    .table-wrap{ overflow-x:auto; margin-top:14px; }
+    table{ width:100%; border-collapse:collapse; font-size:15px; min-width:820px; }
+    th{ text-align:left; padding:10px 10px; background:var(--primary); color:#fff; position:sticky; top:0; font-weight:600; white-space:nowrap; }
+    td{ padding:10px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+    tr:hover td{ background:#FBF8F0; }
+    .badge{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:13px; font-weight:700; }
+    .badge.pass{ background:var(--good-soft); color:var(--good); }
+    .badge.fail{ background:var(--bad-soft); color:var(--bad); }
+    .cab-chip{ display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 4px; border-radius:6px; background:var(--accent-soft); color:#8a5a10; font-weight:700; font-size:14px; font-family:'Noto Serif Thai',serif; }
+    .cab-chip.fridgecab{ background:var(--frost-soft); color:var(--frost); }
+    .row-issue{ font-size:13px; color:var(--bad); margin-top:4px; }
+    .empty-state{ text-align:center; padding:40px 10px; color:var(--ink-soft); font-size:15px; }
+    .loading{ text-align:center; padding:30px; color:var(--ink-soft); font-size:15px; }
+
+    .setup-banner{ background:var(--bad-soft); border:1px solid var(--bad); color:var(--bad); padding:12px 16px; border-radius:10px; font-size:13.5px; margin:16px; }
+  </style>
+</head>
+<body>
+
+<div id="setupBanner" class="setup-banner hidden">
+  ⚠️ ยังไม่ได้ตั้งค่า API_URL — เปิดไฟล์นี้ด้วยโปรแกรมข้อความ แล้วแก้บรรทัด <code>const API_URL = "..."</code> ด้านล่างสุดของไฟล์ ให้เป็นลิงก์ Apps Script Web App ของคุณ
+</div>
+
+<header class="top">
+  <div class="top-nav">
+    <div>
+      <h1>📊 แดชบอร์ดตรวจตู้ยา</h1>
+      <p>งานบริการผู้ป่วยนอก · ห้องจ่ายยา รพ.พระนารายณ์มหาราช</p>
+    </div>
+    <a class="nav-link" href="index.html">+ บันทึกการตรวจ</a>
+  </div>
+</header>
+
+<main>
+
+  <div class="card">
+    <p class="section-title">ภาพรวมตู้ยา (ล่าสุด)</p>
+    <p class="section-sub">สถานะจากการตรวจครั้งล่าสุดของแต่ละตู้ ไม่จำกัดช่วงวันที่ที่กรองด้านล่าง</p>
+    <div class="shelf" id="shelf"></div>
+    <div class="legend">
+      <span><i style="background:var(--good)"></i> ผ่านการตรวจล่าสุด</span>
+      <span><i style="background:var(--bad)"></i> พบปัญหาในการตรวจล่าสุด</span>
+      <span><i style="background:var(--idle)"></i> ยังไม่มีประวัติการตรวจ</span>
+      <span>❄️ ตู้เย็น (ควบคุมอุณหภูมิ)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="section-title">ค้นหา / กรองข้อมูล</p>
+    <div class="filters">
+      <div>
+        <label>จากวันที่</label>
+        <input type="date" id="fDateFrom">
+      </div>
+      <div>
+        <label>ถึงวันที่</label>
+        <input type="date" id="fDateTo">
+      </div>
+      <div>
+        <label>เภสัชกรผู้ตรวจ</label>
+        <select id="fPharmacist"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div>
+        <label>เจ้าหน้าที่ประจำตู้</label>
+        <select id="fStaff"><option value="">ทั้งหมด</option></select>
+      </div>
+      <div>
+        <label>ตู้ยา</label>
+        <select id="fCabinet"><option value="">ทั้งหมด</option></select>
+      </div>
+    </div>
+    <div class="filter-actions">
+      <button class="btn primary" id="btnFilter">กรองข้อมูล</button>
+      <button class="btn ghost" id="btnReset">ล้างตัวกรอง</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="card">
+    <p class="section-title">ประวัติการตรวจ</p>
+    <p class="section-sub">เรียงจากวันที่ตรวจล่าสุด</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>วันที่ตรวจ</th>
+            <th>ตู้</th>
+            <th>เภสัชกรผู้ตรวจ</th>
+            <th>เจ้าหน้าที่ประจำตู้</th>
+            <th>สถานะ</th>
+            <th>รายละเอียด</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody">
+          <tr><td colspan="6" class="loading">กำลังโหลดข้อมูล...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ============================================================
+  // ⚠️ แก้บรรทัดนี้: วาง URL ของ Apps Script Web App (ลงท้ายด้วย /exec)
+  // ต้องเป็น URL เดียวกับที่ตั้งไว้ในไฟล์ index.html
+  // ============================================================
+  const API_URL = "https://script.google.com/macros/s/AKfycbx9xqu7Wr9MN2V37lBXrV3IWihIjTHz8TubTBvhKJnbrPnuyeY8Jfsuby6QICNrYRW5oQ/exec";
+  // ============================================================
+
+  if (API_URL.indexOf('PASTE_YOUR_DEPLOYMENT_ID_HERE') !== -1) {
+    document.getElementById('setupBanner').classList.remove('hidden');
+  }
+
+  const FRIDGE_CABINETS = ['U1','U2'];
+
+  const CHECK_LABELS = {
+    StockComplete: 'เติมยาครบทุกช่อง',
+    FEFOSorted: 'จัดเรียงตามวันหมดอายุ',
+    FridgeTempPass: 'อุณหภูมิตู้เย็นอยู่ในเกณฑ์ 2-8°C',
+    NoFoodDrinkInFridge: 'พบอาหาร/เครื่องดื่มในตู้เย็น',
+    HighAlertOK: 'แยกเก็บยา High Alert',
+    LASAOK: 'แยกเก็บยาชื่อ/รูปพ้องคล้าย',
+    ControlledDrugMatch: 'ยาควบคุมพิเศษตรงบัญชี',
+    CleanlinessOK: 'ความสะอาดของตู้',
+    LockOK: 'ระบบล็อก/ความปลอดภัย'
+  };
+
+  function fmtDate(s){
+    if (!s) return '-';
+    const d = new Date(s);
+    if (isNaN(d)) return s;
+    return d.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric' });
+  }
+
+  function renderShelf(overview){
+    const shelf = document.getElementById('shelf');
+    shelf.innerHTML = '';
+    const cabinets = Object.keys(overview);
+    cabinets.forEach(c => {
+      const rec = overview[c];
+      const isFridge = FRIDGE_CABINETS.indexOf(c) !== -1;
+      const div = document.createElement('div');
+      const snow = isFridge ? '<span class="snow">❄️</span>' : '';
+      if (!rec){
+        div.className = 'drawer' + (isFridge ? ' fridgecab' : '');
+        div.innerHTML = `${snow}<div class="letter">${c}<span class="dot"></span></div><div class="empty-label">ยังไม่มีการตรวจ</div>`;
+      } else {
+        const ok = rec.OverallStatus === 'ผ่าน';
+        div.className = 'drawer ' + (ok ? 'pass' : 'fail') + (isFridge ? ' fridgecab' : '');
+        div.innerHTML = `
+          ${snow}
+          <div class="letter">${c}<span class="dot"></span></div>
+          <div class="meta"><b>${rec.StaffOnDuty || ''}</b><br>${fmtDate(rec.InspectionDate)}</div>`;
+      }
+      shelf.appendChild(div);
+    });
+  }
+
+  function renderStats(records){
+    const total = records.length;
+    const pass = records.filter(r => r.OverallStatus === 'ผ่าน').length;
+    const fail = total - pass;
+    const cabinetsChecked = new Set(records.map(r => r.Cabinet)).size;
+    const el = document.getElementById('stats');
+    el.innerHTML = `
+      <div class="stat"><div class="num">${total}</div><div class="lbl">การตรวจทั้งหมด</div></div>
+      <div class="stat"><div class="num" style="color:var(--good)">${pass}</div><div class="lbl">ผ่านเกณฑ์</div></div>
+      <div class="stat"><div class="num" style="color:var(--bad)">${fail}</div><div class="lbl">พบปัญหา</div></div>
+      <div class="stat"><div class="num">${cabinetsChecked}</div><div class="lbl">ตู้ที่ถูกตรวจในช่วงนี้</div></div>`;
+  }
+
+  function issuesSummary(r){
+    const bad = [];
+    Object.keys(CHECK_LABELS).forEach(k => {
+      if (r[k] === 'N') bad.push(CHECK_LABELS[k]);
+    });
+    return bad;
+  }
+
+  function renderTable(records){
+    const tbody = document.getElementById('tblBody');
+    if (!records.length){
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    records.forEach(r => {
+      const tr = document.createElement('tr');
+      const ok = r.OverallStatus === 'ผ่าน';
+      const isFridge = FRIDGE_CABINETS.indexOf(r.Cabinet) !== -1;
+      const bad = issuesSummary(r);
+      let detail = '';
+      if (!ok){
+        detail = bad.map(b => `<div class="row-issue">• ${b}</div>`).join('');
+        if (r.IssuesFound) detail += `<div class="row-issue">• หมายเหตุ: ${escapeHtml(r.IssuesFound)}</div>`;
+      } else {
+        detail = '<span style="color:var(--ink-soft);font-size:12px;">ไม่พบปัญหา</span>';
+      }
+      tr.innerHTML = `
+        <td>${fmtDate(r.InspectionDate)}</td>
+        <td><span class="cab-chip${isFridge ? ' fridgecab':''}">${r.Cabinet}</span></td>
+        <td>${escapeHtml(r.Pharmacist || '')}</td>
+        <td>${escapeHtml(r.StaffOnDuty || '')}</td>
+        <td><span class="badge ${ok ? 'pass':'fail'}">${r.OverallStatus}</span></td>
+        <td>${detail}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function buildQuery(filters){
+    const params = new URLSearchParams();
+    params.set('action', 'getDashboard');
+    Object.keys(filters || {}).forEach(k => {
+      if (filters[k]) params.set(k, filters[k]);
+    });
+    return params.toString();
+  }
+
+  function loadDashboard(filters){
+    document.getElementById('tblBody').innerHTML = '<tr><td colspan="6" class="loading">กำลังโหลดข้อมูล...</td></tr>';
+
+    fetch(API_URL + '?' + buildQuery(filters))
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+
+        renderShelf(data.overview);
+        renderStats(data.records);
+        renderTable(data.records);
+
+        const pSel = document.getElementById('fPharmacist');
+        if (!pSel.dataset.filled){
+          data.config.pharmacists.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p; opt.textContent = p;
+            pSel.appendChild(opt);
+          });
+          pSel.dataset.filled = '1';
+        }
+        const stSel = document.getElementById('fStaff');
+        if (!stSel.dataset.filled){
+          data.config.staff.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s; opt.textContent = s;
+            stSel.appendChild(opt);
+          });
+          stSel.dataset.filled = '1';
+        }
+        const cSel = document.getElementById('fCabinet');
+        if (!cSel.dataset.filled){
+          data.config.cabinets.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c; opt.textContent = 'ตู้ ' + c;
+            cSel.appendChild(opt);
+          });
+          cSel.dataset.filled = '1';
+        }
+      })
+      .catch(err => {
+        document.getElementById('tblBody').innerHTML =
+          '<tr><td colspan="6" class="empty-state">เกิดข้อผิดพลาด: ' + err.message + '</td></tr>';
+      });
+  }
+
+  document.getElementById('btnFilter').addEventListener('click', function(){
+    loadDashboard({
+      dateFrom: document.getElementById('fDateFrom').value,
+      dateTo: document.getElementById('fDateTo').value,
+      pharmacist: document.getElementById('fPharmacist').value,
+      staff: document.getElementById('fStaff').value,
+      cabinet: document.getElementById('fCabinet').value
+    });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function(){
+    document.getElementById('fDateFrom').value = '';
+    document.getElementById('fDateTo').value = '';
+    document.getElementById('fPharmacist').value = '';
+    document.getElementById('fStaff').value = '';
+    document.getElementById('fCabinet').value = '';
+    loadDashboard({});
+  });
+
+  loadDashboard({});
+</script>
+</body>
+</html>
