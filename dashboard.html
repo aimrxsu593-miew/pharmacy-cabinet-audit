@@ -18,7 +18,8 @@
     body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Noto Sans Thai',sans-serif; -webkit-font-smoothing:antialiased; font-size:16px; }
     header.top{ background:var(--primary); color:#fff; padding:22px 20px 30px; position:relative; overflow:hidden; }
     header.top::after{ content:""; position:absolute; right:-40px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(193,120,23,.35), transparent 70%); pointer-events:none; }
-    .top-nav{ position:relative; z-index:2; display:flex; justify-content:space-between; align-items:center; }
+    .top-nav{ position:relative; z-index:2; }
+    .top-nav{ display:flex; justify-content:space-between; align-items:center; position:relative; }
     header.top h1{ font-family:'Noto Serif Thai',serif; font-size:23px; margin:0 0 4px; }
     header.top p{ margin:0; font-size:14px; opacity:.85; }
     .nav-link{ color:#fff; text-decoration:none; font-size:14.5px; border:1px solid rgba(255,255,255,.5); padding:7px 14px; border-radius:999px; white-space:nowrap; background:transparent; cursor:pointer; }
@@ -79,9 +80,12 @@
     .row-issue{ font-size:13px; color:var(--bad); margin-top:4px; }
     .empty-state{ text-align:center; padding:40px 10px; color:var(--ink-soft); font-size:15px; }
     .loading{ text-align:center; padding:30px; color:var(--ink-soft); font-size:15px; }
+
+    .setup-banner{ background:var(--bad-soft); border:1px solid var(--bad); color:var(--bad); padding:12px 16px; border-radius:10px; font-size:13.5px; margin:16px; }
   </style>
 </head>
 <body>
+
 
 <header class="top">
   <div class="top-nav">
@@ -165,10 +169,15 @@
 
 <script>
   // ============================================================
-  // ⚠️ วาง URL ของ Apps Script Web App (ลงท้ายด้วย /exec) ตรงนี้
+  // ⚠️ แก้บรรทัดนี้: วาง URL ของ Apps Script Web App (ลงท้ายด้วย /exec)
+  // ต้องเป็น URL เดียวกับที่ตั้งไว้ในไฟล์ index.html
   // ============================================================
-  const API_URL = "https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID_HERE/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbx9xqu7Wr9MN2V37lBXrV3IWihIjTHz8TubTBvhKJnbrPnuyeY8Jfsuby6QICNrYRW5oQ/exec";
   // ============================================================
+
+  if (API_URL.indexOf('PASTE_YOUR_DEPLOYMENT_ID_HERE') !== -1) {
+    document.getElementById('setupBanner').classList.remove('hidden');
+  }
 
   const FRIDGE_CABINETS = ['U1','U2'];
 
