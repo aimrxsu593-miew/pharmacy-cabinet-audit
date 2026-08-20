@@ -16,7 +16,8 @@
     *{box-sizing:border-box;}
     body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Noto Sans Thai',sans-serif; -webkit-font-smoothing:antialiased; font-size:16px; }
     header.top{ background:var(--primary); color:#fff; padding:22px 20px 60px; position:relative; overflow:hidden; }
-    header.top::after{ content:""; position:absolute; right:-40px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(193,120,23,.35), transparent 70%); }
+    header.top::after{ content:""; position:absolute; right:-40px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(193,120,23,.35), transparent 70%); pointer-events:none; }
+    .top-nav{ position:relative; z-index:2; }
     header.top h1{ font-family:'Noto Serif Thai',serif; font-size:24px; margin:0 0 4px; position:relative; }
     header.top p{ margin:0; font-size:14px; opacity:.85; position:relative; }
     .top-nav{ display:flex; justify-content:space-between; align-items:center; position:relative; }
