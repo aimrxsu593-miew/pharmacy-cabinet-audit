@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>แบบฟอร์มตรวจตู้ยา</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#FAF7F0; --surface:#FFFFFF; --ink:#20291F; --ink-soft:#5B6459;
+      --primary:#1F3D2B; --primary-light:#2F5940; --accent:#C17817; --accent-soft:#F3E3C2;
+      --good:#2E7D4F; --good-soft:#E4F2E9; --bad:#B8412C; --bad-soft:#F8E7E2;
+      --frost:#3E7CA6; --frost-soft:#E4EEF4; --border:#E4DFD0; --radius:14px;
+    }
+    *{box-sizing:border-box;}
+    body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Noto Sans Thai',sans-serif; -webkit-font-smoothing:antialiased; font-size:16px; }
+    header.top{ background:var(--primary); color:#fff; padding:22px 20px 60px; position:relative; overflow:hidden; }
+    header.top::after{ content:""; position:absolute; right:-40px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(193,120,23,.35), transparent 70%); }
+    header.top h1{ font-family:'Noto Serif Thai',serif; font-size:24px; margin:0 0 4px; position:relative; }
+    header.top p{ margin:0; font-size:14px; opacity:.85; position:relative; }
+    .top-nav{ display:flex; justify-content:space-between; align-items:center; position:relative; }
+    .nav-link{ color:#fff; text-decoration:none; font-size:14.5px; border:1px solid rgba(255,255,255,.5); padding:7px 14px; border-radius:999px; white-space:nowrap; background:transparent; cursor:pointer; }
+    .nav-link:hover{ background:rgba(255,255,255,.12); }
+
+    main{ max-width:640px; margin:-38px auto 40px; padding:0 16px; position:relative; }
+    .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; box-shadow:0 8px 24px rgba(31,61,43,.06); }
+    .section-title{ font-family:'Noto Serif Thai',serif; font-size:19px; color:var(--primary); margin:0 0 4px; display:flex; align-items:center; gap:8px; }
+    .section-sub{ font-size:14px; color:var(--ink-soft); margin:0 0 16px; }
+    label{ display:block; font-size:15.5px; font-weight:600; margin:14px 0 6px; color:var(--ink); }
+    label .opt{ font-weight:400; color:var(--ink-soft); }
+    input[type=text], input[type=date], input[type=number], select, textarea{
+      width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px;
+      font-family:inherit; font-size:16px; background:#FFFDF8; color:var(--ink);
+    }
+    textarea{ min-height:64px; resize:vertical; }
+    input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--primary-light); box-shadow:0 0 0 3px rgba(47,89,64,.14); }
+
+    .toggle-row{ display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
+    .toggle-btn{ flex:1; min-width:90px; border:1px solid var(--border); background:#FFFDF8; border-radius:10px; padding:10px 8px; font-size:15px; font-weight:600; color:var(--ink-soft); cursor:pointer; text-align:center; transition:all .12s ease; }
+    .toggle-btn.pass.active{ background:var(--good-soft); border-color:var(--good); color:var(--good); }
+    .toggle-btn.fail.active{ background:var(--bad-soft); border-color:var(--bad); color:var(--bad); }
+    .toggle-btn.neutral.active{ background:var(--accent-soft); border-color:var(--accent); color:#8a5a10; }
+
+    .conditional{ border-left:3px solid var(--accent); padding-left:12px; margin-top:12px; background:linear-gradient(90deg, rgba(193,120,23,.06), transparent 60%); border-radius:0 8px 8px 0; }
+    .hidden{ display:none !important; }
+
+    .cabinet-picker{ display:grid; grid-template-columns:repeat(7,1fr); gap:7px; margin-top:6px; }
+    @media (max-width:420px){ .cabinet-picker{ grid-template-columns:repeat(6,1fr);} }
+    .cab-btn{ aspect-ratio:1; border:1px solid var(--border); background:#FFFDF8; border-radius:9px; font-family:'Noto Serif Thai',serif; font-size:16px; font-weight:700; color:var(--primary); cursor:pointer; }
+    .cab-btn.fridge{ color:var(--frost); border-color:#CBE0EC; background:var(--frost-soft); font-size:13.5px;}
+    .cab-btn.active{ background:var(--primary); color:#fff; border-color:var(--primary); }
+    .cab-btn.fridge.active{ background:var(--frost); border-color:var(--frost); color:#fff; }
+    .cab-legend{ font-size:13px; color:var(--ink-soft); margin-top:8px; }
+    .cab-legend span{ display:inline-flex; align-items:center; gap:5px; margin-right:14px; }
+    .cab-legend i{ width:9px; height:9px; border-radius:3px; display:inline-block; background:var(--frost-soft); border:1px solid #CBE0EC;}
+
+    .submit-bar{ position:sticky; bottom:0; background:linear-gradient(180deg, transparent, var(--bg) 30%); padding:14px 0 6px; }
+    button.submit{ width:100%; background:var(--primary); color:#fff; border:none; padding:15px; border-radius:12px; font-size:17.5px; font-weight:700; font-family:'Noto Sans Thai',sans-serif; cursor:pointer; box-shadow:0 6px 18px rgba(31,61,43,.28); }
+    button.submit:disabled{ opacity:.6; }
+
+    .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:var(--primary); color:#fff; padding:13px 20px; border-radius:12px; font-size:15px; opacity:0; transition:all .25s ease; box-shadow:0 10px 24px rgba(0,0,0,.2); z-index:50; max-width:90%; text-align:center; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.bad{ background:var(--bad); }
+
+    .hint{ font-size:13.5px; color:var(--ink-soft); margin-top:4px; }
+    .req::after{ content:" *"; color:var(--bad); }
+
+    .setup-banner{ background:var(--bad-soft); border:1px solid var(--bad); color:var(--bad); padding:12px 16px; border-radius:10px; font-size:13.5px; margin:16px; }
+  </style>
+</head>
+<body>
+
+<div id="setupBanner" class="setup-banner hidden">
+  ⚠️ ยังไม่ได้ตั้งค่า API_URL — เปิดไฟล์นี้ด้วยโปรแกรมข้อความ แล้วแก้บรรทัด <code>const API_URL = "..."</code> ด้านล่างสุดของไฟล์ ให้เป็นลิงก์ Apps Script Web App ของคุณ
+</div>
+
+<header class="top">
+  <div class="top-nav">
+    <div>
+      <h1>🗄️ บันทึกการตรวจตู้ยา</h1>
+      <p>งานบริการผู้ป่วยนอก · ห้องจ่ายยา รพ.พระนารายณ์มหาราช</p>
+    </div>
+    <a class="nav-link" href="dashboard.html">ดูแดชบอร์ด →</a>
+  </div>
+</header>
+
+<main>
+  <form id="auditForm">
+
+    <div class="card">
+      <p class="section-title">ข้อมูลการตรวจ</p>
+      <p class="section-sub">ระบุวันที่ ผู้ตรวจ เจ้าหน้าที่ประจำตู้ และตู้ยาที่ตรวจ</p>
+
+      <label class="req">วันที่ตรวจ</label>
+      <input type="date" id="inspectionDate" required>
+
+      <label class="req">เภสัชกรผู้ตรวจ</label>
+      <select id="pharmacist" required>
+        <option value="">— เลือกรายชื่อ —</option>
+      </select>
+
+      <label class="req">เจ้าหน้าที่ประจำตู้</label>
+      <select id="staffOnDuty" required>
+        <option value="">— เลือกรายชื่อ —</option>
+      </select>
+
+      <label class="req">ตู้ยาที่ตรวจ</label>
+      <div class="cabinet-picker" id="cabinetPicker"></div>
+      <div class="cab-legend"><span><i></i>ตู้ U1, U2 มีระบบควบคุมอุณหภูมิ (ตู้เย็น)</span></div>
+      <input type="hidden" id="cabinet" required>
+    </div>
+
+    <div class="card">
+      <p class="section-title">การเติมยา &amp; การจัดเรียง</p>
+      <p class="section-sub">ตรวจสอบความครบถ้วนและการจัดเรียงตามวันหมดอายุ</p>
+
+      <label class="req">เติมยาครบทุกช่องหรือไม่</label>
+      <div class="toggle-row" data-target="stockComplete">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ ครบ</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ ไม่ครบ</button>
+      </div>
+      <div id="missingItemsWrap" class="conditional hidden">
+        <label>รายการยาที่ขาด</label>
+        <textarea id="missingItems" placeholder="ระบุชื่อยาและจำนวนที่ขาด"></textarea>
+      </div>
+      <input type="hidden" id="stockComplete">
+
+      <label class="req">จัดเรียงยาตามวันหมดอายุ (First-Expired-First-Out)</label>
+      <div class="toggle-row" data-target="fefoSorted">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ ถูกต้อง</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ ไม่ถูกต้อง</button>
+      </div>
+      <input type="hidden" id="fefoSorted">
+
+      <label>ยาใกล้หมดอายุ (≤ 3 เดือน) หรือหมดอายุแล้ว <span class="opt">(ถ้ามี ระบุรายการ)</span></label>
+      <textarea id="expiringItems" placeholder="ชื่อยา / จำนวน / วันหมดอายุ"></textarea>
+    </div>
+
+    <div id="fridgeCard" class="card hidden">
+      <p class="section-title">❄️ การควบคุมอุณหภูมิตู้เย็น</p>
+      <p class="section-sub">แสดงเฉพาะตู้ U1 / U2 ซึ่งเป็นตู้เย็นเก็บยา</p>
+
+      <label class="req">อุณหภูมิที่วัดได้ (°C)</label>
+      <input type="number" step="0.1" id="fridgeTemp" placeholder="เช่น 4.5">
+      <p class="hint">เกณฑ์มาตรฐาน 2–8°C ระบบจะประเมินผ่าน/ไม่ผ่านให้อัตโนมัติ</p>
+
+      <label class="req">ไม่มีอาหารหรือเครื่องดื่มแช่ภายในตู้เย็น</label>
+      <div class="toggle-row" data-target="noFoodDrink">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ ไม่มี (ถูกต้อง)</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ พบอาหาร/เครื่องดื่ม</button>
+      </div>
+      <input type="hidden" id="noFoodDrink">
+    </div>
+
+    <div class="card">
+      <p class="section-title">ความปลอดภัยการจัดเก็บยา</p>
+      <p class="section-sub">ยา High Alert / ยาชื่อพ้องมองคล้าย / ยาควบคุมพิเศษ</p>
+
+      <label class="req">ยา High Alert แยกเก็บ/มีป้ายเตือนชัดเจน</label>
+      <div class="toggle-row" data-target="highAlertOK">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ ถูกต้อง</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ ไม่ถูกต้อง</button>
+      </div>
+      <input type="hidden" id="highAlertOK">
+
+      <label class="req">ยาชื่อ/รูปพ้องคล้าย (LASA) แยกจัดเก็บหรือติดป้ายเตือน</label>
+      <div class="toggle-row" data-target="lasaOK">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ ถูกต้อง</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ ไม่ถูกต้อง</button>
+      </div>
+      <input type="hidden" id="lasaOK">
+
+      <label>ยาเสพติด/วัตถุออกฤทธิ์ในตู้นี้ นับจำนวนตรงตามบัญชีหรือไม่</label>
+      <div class="toggle-row" data-target="controlledDrugMatch">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ ตรงกัน</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ ไม่ตรงกัน</button>
+        <button type="button" class="toggle-btn neutral" data-value="NA">ไม่มีในตู้นี้</button>
+      </div>
+      <input type="hidden" id="controlledDrugMatch" value="NA">
+    </div>
+
+    <div class="card">
+      <p class="section-title">สภาพตู้ &amp; ความปลอดภัยทั่วไป</p>
+
+      <label class="req">ความสะอาดของตู้/พื้นที่จัดเก็บ</label>
+      <div class="toggle-row" data-target="cleanlinessOK">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ สะอาด</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ ไม่สะอาด</button>
+      </div>
+      <input type="hidden" id="cleanlinessOK">
+
+      <label class="req">ระบบล็อก/ความปลอดภัยของตู้ใช้งานได้ปกติ</label>
+      <div class="toggle-row" data-target="lockOK">
+        <button type="button" class="toggle-btn pass" data-value="Y">✓ ปกติ</button>
+        <button type="button" class="toggle-btn fail" data-value="N">✕ ผิดปกติ</button>
+      </div>
+      <input type="hidden" id="lockOK">
+    </div>
+
+    <div class="card">
+      <p class="section-title">ปัญหาที่พบ &amp; การแก้ไข</p>
+      <p class="section-sub">กรอกเฉพาะกรณีพบปัญหาจากการตรวจข้างต้น</p>
+
+      <label>ปัญหาที่พบ</label>
+      <textarea id="issuesFound" placeholder="สรุปปัญหาที่พบทั้งหมด"></textarea>
+
+      <label>การแก้ไขที่ดำเนินการแล้ว</label>
+      <textarea id="actionTaken" placeholder="เช่น เติมยาเพิ่ม, จัดเรียงใหม่, แจ้งช่างซ่อม"></textarea>
+
+      <label>ผู้รับผิดชอบติดตามแก้ไข</label>
+      <input type="text" id="responsiblePerson" placeholder="ชื่อผู้รับผิดชอบ (ถ้ามี)">
+
+      <label>หมายเหตุเพิ่มเติม</label>
+      <textarea id="notes" placeholder="ข้อมูลเพิ่มเติมอื่น ๆ"></textarea>
+    </div>
+
+    <div class="submit-bar">
+      <button type="submit" class="submit" id="submitBtn">บันทึกผลการตรวจ</button>
+    </div>
+  </form>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ============================================================
+  // ⚠️ แก้บรรทัดนี้: วาง URL ของ Apps Script Web App (ลงท้ายด้วย /exec)
+  // ============================================================
+  const API_URL = "https://script.google.com/macros/s/AKfycbx9xqu7Wr9MN2V37lBXrV3IWihIjTHz8TubTBvhKJnbrPnuyeY8Jfsuby6QICNrYRW5oQ/exec";
+  // ============================================================
+
+  if (API_URL.indexOf('PASTE_YOUR_DEPLOYMENT_ID_HERE') !== -1) {
+    document.getElementById('setupBanner').classList.remove('hidden');
+  }
+
+  const FRIDGE_CABINETS = ['U1','U2'];
+
+  // ---------- toggle buttons ----------
+  document.querySelectorAll('.toggle-row').forEach(row => {
+    const targetId = row.dataset.target;
+    row.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        row.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(targetId).value = btn.dataset.value;
+        if (targetId === 'stockComplete'){
+          document.getElementById('missingItemsWrap').classList.toggle('hidden', btn.dataset.value !== 'N');
+        }
+      });
+    });
+  });
+
+  // ---------- cabinet picker ----------
+  const cabinetPicker = document.getElementById('cabinetPicker');
+  function renderCabinets(list){
+    cabinetPicker.innerHTML = '';
+    list.forEach(c => {
+      const isFridge = FRIDGE_CABINETS.indexOf(c) !== -1;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cab-btn' + (isFridge ? ' fridge' : '');
+      b.textContent = c;
+      b.addEventListener('click', () => {
+        cabinetPicker.querySelectorAll('.cab-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        document.getElementById('cabinet').value = c;
+        toggleFridgeCard(isFridge);
+      });
+      cabinetPicker.appendChild(b);
+    });
+  }
+
+  function toggleFridgeCard(show){
+    const card = document.getElementById('fridgeCard');
+    card.classList.toggle('hidden', !show);
+    if (!show){
+      document.getElementById('fridgeTemp').value = '';
+      document.getElementById('noFoodDrink').value = '';
+      card.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    }
+  }
+
+  // ---------- load config from API ----------
+  fetch(API_URL + '?action=getConfig')
+    .then(res => res.json())
+    .then(cfg => {
+      const pSel = document.getElementById('pharmacist');
+      cfg.pharmacists.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p; opt.textContent = p;
+        pSel.appendChild(opt);
+      });
+      const sSel = document.getElementById('staffOnDuty');
+      cfg.staff.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        sSel.appendChild(opt);
+      });
+      renderCabinets(cfg.cabinets);
+    })
+    .catch(err => showToast('โหลดข้อมูลตั้งต้นไม่สำเร็จ: ' + err.message, true));
+
+  // default date = today
+  document.getElementById('inspectionDate').valueAsDate = new Date();
+
+  // ---------- toast ----------
+  function showToast(msg, bad){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.toggle('bad', !!bad);
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  // ---------- submit ----------
+  document.getElementById('auditForm').addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const cabinet = document.getElementById('cabinet').value;
+    const isFridge = FRIDGE_CABINETS.indexOf(cabinet) !== -1;
+
+    const required = ['inspectionDate','pharmacist','staffOnDuty','cabinet','stockComplete','fefoSorted',
+      'highAlertOK','lasaOK','cleanlinessOK','lockOK'];
+    for (const id of required){
+      if (!document.getElementById(id).value){
+        showToast('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (มีเครื่องหมาย *)', true);
+        return;
+      }
+    }
+    if (isFridge && (!document.getElementById('fridgeTemp').value || !document.getElementById('noFoodDrink').value)){
+      showToast('กรุณากรอกข้อมูลอุณหภูมิตู้เย็นให้ครบถ้วน', true);
+      return;
+    }
+
+    const data = {
+      inspectionDate: document.getElementById('inspectionDate').value,
+      pharmacist: document.getElementById('pharmacist').value,
+      staffOnDuty: document.getElementById('staffOnDuty').value,
+      cabinet: cabinet,
+      stockComplete: document.getElementById('stockComplete').value,
+      missingItems: document.getElementById('missingItems').value,
+      fefoSorted: document.getElementById('fefoSorted').value,
+      expiringItems: document.getElementById('expiringItems').value,
+      fridgeTemp: document.getElementById('fridgeTemp').value,
+      noFoodDrink: document.getElementById('noFoodDrink').value,
+      highAlertOK: document.getElementById('highAlertOK').value,
+      lasaOK: document.getElementById('lasaOK').value,
+      controlledDrugMatch: document.getElementById('controlledDrugMatch').value,
+      cleanlinessOK: document.getElementById('cleanlinessOK').value,
+      lockOK: document.getElementById('lockOK').value,
+      issuesFound: document.getElementById('issuesFound').value,
+      actionTaken: document.getElementById('actionTaken').value,
+      responsiblePerson: document.getElementById('responsiblePerson').value,
+      notes: document.getElementById('notes').value
+    };
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'กำลังบันทึก...';
+
+    // ใช้ text/plain เพื่อเลี่ยงปัญหา CORS preflight กับ Apps Script
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data)
+    })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false;
+        btn.textContent = 'บันทึกผลการตรวจ';
+        if (res.error){
+          showToast('เกิดข้อผิดพลาด: ' + res.error, true);
+          return;
+        }
+        showToast(res.overallStatus === 'ผ่าน' ? '✓ บันทึกสำเร็จ — ผลการตรวจ: ผ่าน' : '⚠ บันทึกสำเร็จ — พบปัญหาที่ต้องติดตาม');
+        document.getElementById('auditForm').reset();
+        document.getElementById('inspectionDate').valueAsDate = new Date();
+        document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.cab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('missingItemsWrap').classList.add('hidden');
+        document.getElementById('controlledDrugMatch').value = 'NA';
+        toggleFridgeCard(false);
+        window.scrollTo({top:0, behavior:'smooth'});
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.textContent = 'บันทึกผลการตรวจ';
+        showToast('เกิดข้อผิดพลาด: ' + err.message, true);
+      });
+  });
+</script>
+</body>
+</html>
