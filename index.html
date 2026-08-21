@@ -228,10 +228,10 @@
   // ============================================================
   // ⚠️ แก้บรรทัดนี้: วาง URL ของ Apps Script Web App (ลงท้ายด้วย /exec)
   // ============================================================
-  const API_URL = "https://script.google.com/macros/s/AKfycbx9xqu7Wr9MN2V37lBXrV3IWihIjTHz8TubTBvhKJnbrPnuyeY8Jfsuby6QICNrYRW5oQ/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxoRh9dkz_JIT_8oxGbXtYENq7_ACjaTcPfqzGzB8xetTuUqa38sWchhxd4zVLMR5oQbA/exec";
   // ============================================================
 
-  if (API_URL.indexOf('PASTE_YOUR_DEPLOYMENT_ID_HERE') !== -1) {
+  if (API_URL.indexOf('PASTE_YOUR_DEPLOYMENT_ID_HERE') !== -1 || API_URL.indexOf('script.google.com') === -1) {
     document.getElementById('setupBanner').classList.remove('hidden');
   }
 
